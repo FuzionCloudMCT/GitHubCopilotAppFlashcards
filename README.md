@@ -4,6 +4,8 @@ A zero-build static site: `index.html`, `styles.css`, `app.js`, `cards.json`. No
 
 Six tabs (Starting a project, Planning, Modes, Pull requests, Automations, Customization). Click or press Enter/Space on a question to flip it; the answer and a docs link appear. The card resets to the question after 60 seconds.
 
+Live site: https://fuzioncloudmct.github.io/GitHubCopilotAppFlashcards/
+
 ## Run locally
 
 `app.js` uses `fetch`, so serve the folder over HTTP (opening the file directly won't work):
