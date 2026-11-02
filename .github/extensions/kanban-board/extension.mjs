@@ -1,26 +1,39 @@
 import { createServer } from "node:http";
 import { readFileSync, writeFileSync, existsSync, mkdirSync, watch } from "node:fs";
-import { dirname, join, resolve } from "node:path";
+import { dirname, join, resolve, relative, isAbsolute } from "node:path";
+import { fileURLToPath } from "node:url";
 import { randomUUID } from "node:crypto";
 import { createCanvas, CanvasError, joinSession } from "@github/copilot-sdk/extension";
 
 const DEFAULT_FILE = "docs/kanban.json";
 const DEFAULT_COLUMNS = ["Backlog", "In progress", "Done"];
 
-function findRepoRoot(start) {
+// Walks up from `start` to the nearest directory containing .git; null if none.
+function gitRootFrom(start) {
     let dir = resolve(start);
     while (true) {
         if (existsSync(join(dir, ".git"))) return dir;
         const parent = dirname(dir);
-        if (parent === dir) return resolve(start);
+        if (parent === dir) return null;
         dir = parent;
     }
 }
-const REPO_ROOT = findRepoRoot(process.cwd());
 
-function boardPath(file) {
-    const p = resolve(REPO_ROOT, file || DEFAULT_FILE);
-    if (!p.startsWith(REPO_ROOT)) throw new CanvasError("invalid_path", "Board file must be inside the repo");
+// Repo root order: KANBAN_REPO_ROOT env, explicit repoRoot input, git root of cwd,
+// git root of this file (<repo>/.github/extensions/kanban-board/), else cwd.
+function resolveRoot(explicit) {
+    if (process.env.KANBAN_REPO_ROOT) return resolve(process.env.KANBAN_REPO_ROOT);
+    if (explicit) return resolve(String(explicit));
+    return gitRootFrom(process.cwd())
+        || gitRootFrom(dirname(fileURLToPath(import.meta.url)))
+        || resolve(process.cwd());
+}
+
+// A board target is { file, root }; all board operations take one.
+function boardPath(t) {
+    const p = resolve(t.root, t.file || DEFAULT_FILE);
+    const rel = relative(t.root, p);
+    if (rel === "" || rel.startsWith("..") || isAbsolute(rel)) throw new CanvasError("invalid_path", "Board file must be inside the repo");
     return p;
 }
 
@@ -33,7 +46,7 @@ function load(file) {
         if (!Array.isArray(b.cards)) b.cards = [];
         return b;
     } catch (e) {
-        throw new CanvasError("board_unreadable", `Cannot parse ${file}: ${e.message}`);
+        throw new CanvasError("board_unreadable", `Cannot parse ${file.file}: ${e.message}`);
     }
 }
 
@@ -143,7 +156,7 @@ async function startServer(file) {
             const post = { "/add": ops.add, "/update": ops.update, "/move": ops.move, "/delete": ops.remove }[url.pathname];
             if (req.method === "GET" && url.pathname === "/") {
                 res.setHeader("Content-Type", "text/html; charset=utf-8");
-                res.end(renderHtml(file));
+                res.end(renderHtml(file.file));
             } else if (req.method === "GET" && url.pathname === "/board") {
                 res.setHeader("Content-Type", "application/json");
                 res.end(JSON.stringify(load(file)));
@@ -168,10 +181,13 @@ async function startServer(file) {
         }
     });
     await new Promise((r) => server.listen(0, "127.0.0.1", r));
-    return { server, url: `http://127.0.0.1:${server.address().port}/`, watcher, poll, clients };
+    return { server, url: `http://127.0.0.1:${server.address().port}/`, watcher, poll, clients, root: file.root };
 }
 
-const fileOf = (input) => (input && input.file) || DEFAULT_FILE;
+const targetOf = (ctx) => ({
+    file: (ctx.input && ctx.input.file) || DEFAULT_FILE,
+    root: resolveRoot((ctx.input && ctx.input.repoRoot) || servers.get(ctx.instanceId)?.root),
+});
 
 const cardProps = {
     id: { type: "string", description: "Card id" },
@@ -188,39 +204,42 @@ await joinSession({
             description: "Interactive Kanban board of future flashcard-site features, stored in docs/kanban.json; editable by both user and agent.",
             inputSchema: {
                 type: "object",
-                properties: { file: { type: "string", description: "Repo-relative board JSON path (default docs/kanban.json)" } },
+                properties: {
+                    file: { type: "string", description: "Repo-relative board JSON path (default docs/kanban.json)" },
+                    repoRoot: { type: "string", description: "Absolute repo root; overrides cwd detection (KANBAN_REPO_ROOT env still wins)" },
+                },
             },
             actions: [
-                { name: "list_cards", description: "Return the board columns and all cards.", handler: async (ctx) => load(fileOf(ctx.input)) },
+                { name: "list_cards", description: "Return the board columns and all cards.", handler: async (ctx) => load(targetOf(ctx)) },
                 {
                     name: "add_card", description: "Add a card (defaults to the first column).",
                     inputSchema: { type: "object", required: ["title"], properties: { title: cardProps.title, description: cardProps.description, column: cardProps.column } },
-                    handler: async (ctx) => ops.add(fileOf(ctx.input), ctx.input),
+                    handler: async (ctx) => ops.add(targetOf(ctx), ctx.input),
                 },
                 {
                     name: "update_card", description: "Edit a card's title and/or description.",
                     inputSchema: { type: "object", required: ["id"], properties: { id: cardProps.id, title: cardProps.title, description: cardProps.description } },
-                    handler: async (ctx) => ops.update(fileOf(ctx.input), ctx.input),
+                    handler: async (ctx) => ops.update(targetOf(ctx), ctx.input),
                 },
                 {
                     name: "move_card", description: "Move a card to a column, optionally at a position.",
                     inputSchema: { type: "object", required: ["id", "column"], properties: { id: cardProps.id, column: cardProps.column, index: { type: "integer", minimum: 0 } } },
-                    handler: async (ctx) => ops.move(fileOf(ctx.input), ctx.input),
+                    handler: async (ctx) => ops.move(targetOf(ctx), ctx.input),
                 },
                 {
                     name: "delete_card", description: "Delete a card by id.",
                     inputSchema: { type: "object", required: ["id"], properties: { id: cardProps.id } },
-                    handler: async (ctx) => ops.remove(fileOf(ctx.input), ctx.input),
+                    handler: async (ctx) => ops.remove(targetOf(ctx), ctx.input),
                 },
             ],
             open: async (ctx) => {
-                const file = fileOf(ctx.input);
+                const file = targetOf(ctx);
                 let entry = servers.get(ctx.instanceId);
                 if (!entry) {
                     entry = await startServer(file);
                     servers.set(ctx.instanceId, entry);
                 }
-                return { url: entry.url, title: "Kanban board", status: file };
+                return { url: entry.url, title: "Kanban board", status: file.file };
             },
             onClose: async (ctx) => {
                 const entry = servers.get(ctx.instanceId);
