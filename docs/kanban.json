@@ -1,0 +1,11 @@
+{
+  "columns": ["Backlog", "In progress", "Done"],
+  "cards": [
+    { "id": "c-scoring", "title": "Scoring / self-rating", "description": "Let the user rate each card (got it / unsure / missed) and show a running score.", "column": "Backlog" },
+    { "id": "c-tab-progress", "title": "Per-tab progress tracking", "description": "Track which topics (tabs) the user has flipped every card in and show a completion indicator.", "column": "Backlog" },
+    { "id": "c-shuffle", "title": "Shuffle mode", "description": "Randomize card order within a topic.", "column": "Backlog" },
+    { "id": "c-localstorage", "title": "Remember progress in localStorage", "description": "Persist scores and viewed-card state between visits.", "column": "Backlog" },
+    { "id": "c-more-cards", "title": "More cards per topic", "description": "Expand the deck with additional cards for each topic.", "column": "Backlog" },
+    { "id": "c-docs-links", "title": "Verify / add specific docs links for Copilot-app cards", "description": "Check each Copilot app card links to the specific, correct documentation page.", "column": "Backlog" }
+  ]
+}
