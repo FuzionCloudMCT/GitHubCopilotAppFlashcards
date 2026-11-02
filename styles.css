@@ -1,0 +1,119 @@
+:root {
+  color-scheme: light dark;
+  --bg: #f6f8fa;
+  --surface: #fff;
+  --text: #1f2328;
+  --muted: #59636e;
+  --accent: #0969da;
+  --answer-bg: #ddf4ff;
+  --border: #d1d9e0;
+  --flip-time: 0.6s;
+  font-family: system-ui, sans-serif;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0d1117;
+    --surface: #151b23;
+    --text: #f0f6fc;
+    --muted: #9198a1;
+    --accent: #4493f8;
+    --answer-bg: #0c2d6b;
+    --border: #3d444d;
+  }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  padding: 1rem;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.5;
+}
+
+header, main { max-width: 70rem; margin-inline: auto; }
+h1 { margin-block: 0.5rem; font-size: clamp(1.5rem, 4vw, 2.25rem); }
+header p { color: var(--muted); }
+
+[role="tablist"] {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  border-bottom: 1px solid var(--border);
+}
+
+[role="tab"] {
+  padding: 0.6rem 1rem;
+  font: inherit;
+  color: var(--muted);
+  background: none;
+  border: 0;
+  border-bottom: 3px solid transparent;
+  cursor: pointer;
+}
+
+[role="tab"][aria-selected="true"] {
+  color: var(--text);
+  border-bottom-color: var(--accent);
+  font-weight: 600;
+}
+
+:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+
+[role="tabpanel"] {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
+  gap: 1rem;
+  padding-block: 1.5rem;
+}
+
+[role="tabpanel"][hidden] { display: none; }
+
+.card {
+  position: relative;
+  min-height: 14rem;
+  padding: 0;
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: 0;
+  perspective: 1000px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.inner {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+  transition: transform var(--flip-time);
+}
+
+.card[aria-pressed="true"] .inner { transform: rotateY(180deg); }
+
+.face {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 1.25rem;
+  overflow: auto;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 0.75rem;
+  backface-visibility: hidden;
+}
+
+.front { font-size: 1.1rem; font-weight: 600; }
+.back { background: var(--answer-bg); transform: rotateY(180deg); }
+.back a { color: var(--accent); font-weight: 600; }
+
+.hint { font-size: 0.8rem; font-weight: 400; color: var(--muted); }
+
+@media (prefers-reduced-motion: reduce) {
+  :root { --flip-time: 0s; }
+}

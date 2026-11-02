@@ -1,0 +1,66 @@
+[
+  {
+    "id": "start",
+    "title": "Starting a project",
+    "cards": [
+      { "q": "What is the first thing you do to begin working on a repository in the Copilot app?", "a": "Add the repository (clone it from GitHub or point to a local folder) so the app can create a project for it.", "url": "https://docs.github.com/en/copilot" },
+      { "q": "What is a session?", "a": "A conversation with Copilot about a task, run in its own workspace so work on one task doesn't disturb another.", "url": "https://docs.github.com/en/copilot" },
+      { "q": "Why does a new session usually get its own git worktree and branch?", "a": "It isolates changes: each task has its own working copy and branch, so you can run several tasks in parallel safely.", "url": "https://git-scm.com/docs/git-worktree" },
+      { "q": "How should you describe your first task to get good results?", "a": "State the goal, the context (files, constraints) and what 'done' looks like. Specific prompts produce better results.", "url": "https://docs.github.com/en/copilot/using-github-copilot/prompt-engineering-for-github-copilot" },
+      { "q": "Where can you start if you have no repository yet?", "a": "Create a new repository on GitHub (or a new local folder) and add it as a project.", "url": "https://docs.github.com/en/repositories/creating-and-managing-repositories/creating-a-new-repository" }
+    ]
+  },
+  {
+    "id": "plan",
+    "title": "Planning",
+    "cards": [
+      { "q": "Why plan a project before writing code?", "a": "A plan surfaces requirements, risks and steps up front, so you can correct direction cheaply before any files change.", "url": "https://docs.github.com/en/copilot" },
+      { "q": "What should a good plan include?", "a": "The goal, the approach, the files or components affected, the steps in order, and how you'll verify the result.", "url": "https://docs.github.com/en/copilot" },
+      { "q": "What can you do with a plan Copilot proposes?", "a": "Review it, ask for changes or answer its questions, then approve it before implementation starts.", "url": "https://docs.github.com/en/copilot" },
+      { "q": "How can you break a large project into manageable pieces?", "a": "Split it into small, independent tasks (for example one issue or pull request each) and plan each separately.", "url": "https://docs.github.com/en/issues/tracking-your-work-with-issues/about-issues" }
+    ]
+  },
+  {
+    "id": "modes",
+    "title": "Modes",
+    "cards": [
+      { "q": "What does Plan mode do?", "a": "Copilot researches and drafts a step-by-step plan for you to review. It doesn't implement until you approve.", "url": "https://docs.github.com/en/copilot" },
+      { "q": "What does Interactive mode do?", "a": "Copilot works with you step by step, asking questions and requesting permission as it goes. You stay in control.", "url": "https://docs.github.com/en/copilot" },
+      { "q": "What does Autopilot mode do?", "a": "Copilot keeps working on its own toward the goal without waiting for input, making reasonable assumptions and finishing the task.", "url": "https://docs.github.com/en/copilot" },
+      { "q": "When would you choose Plan over Autopilot?", "a": "When the task is large or ambiguous and you want to agree on the approach before anything changes.", "url": "https://docs.github.com/en/copilot" },
+      { "q": "When is Autopilot a good fit?", "a": "For well-defined tasks you trust Copilot to complete unattended; review the result afterwards.", "url": "https://docs.github.com/en/copilot" }
+    ]
+  },
+  {
+    "id": "prs",
+    "title": "Pull requests",
+    "cards": [
+      { "q": "What is a pull request?", "a": "A proposal to merge the changes on one branch into another, where others can review and discuss them.", "url": "https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/about-pull-requests" },
+      { "q": "How do you create a pull request for a session's work?", "a": "Commit the changes on the session's branch, push it, then open a pull request against the base branch (for example main).", "url": "https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/creating-a-pull-request" },
+      { "q": "What should you check before merging?", "a": "Review the diff, address review comments, and make sure required checks pass and there are no conflicts.", "url": "https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/reviewing-changes-in-pull-requests/about-pull-request-reviews" },
+      { "q": "How do you merge a pull request?", "a": "Choose a merge method (merge commit, squash or rebase) on the pull request page and confirm the merge.", "url": "https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/incorporating-changes-from-a-pull-request/merging-a-pull-request" },
+      { "q": "What happens to the branch after merging?", "a": "You can delete it; the changes now live on the base branch.", "url": "https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-branches-in-your-repository/deleting-and-restoring-branches-in-a-pull-request" }
+    ]
+  },
+  {
+    "id": "automations",
+    "title": "Automations",
+    "cards": [
+      { "q": "What is an automation?", "a": "A saved prompt that Copilot runs for you on a schedule or in response to a trigger, instead of you starting it by hand.", "url": "https://docs.github.com/en/copilot" },
+      { "q": "Give an example of a good automation.", "a": "A weekly summary of open pull requests, or a daily check that fixes failing CI on a branch.", "url": "https://docs.github.com/en/copilot" },
+      { "q": "What do you define when you create an automation?", "a": "The instructions (prompt), where it runs, and when it runs (a schedule or trigger).", "url": "https://docs.github.com/en/copilot" },
+      { "q": "How do automations relate to GitHub Actions?", "a": "Actions run workflow files in CI; Copilot automations run an AI agent task. Both can be triggered by schedules or events.", "url": "https://docs.github.com/en/actions/about-github-actions/understanding-github-actions" }
+    ]
+  },
+  {
+    "id": "customize",
+    "title": "Customization",
+    "cards": [
+      { "q": "How do you change the AI model Copilot uses?", "a": "Pick a different model from the model picker; available models depend on your plan and organization policy.", "url": "https://docs.github.com/en/copilot/using-github-copilot/ai-models/changing-the-ai-model-for-copilot-chat" },
+      { "q": "What is MCP?", "a": "The Model Context Protocol: an open standard that lets Copilot connect to external tools and data sources.", "url": "https://docs.github.com/en/copilot/customizing-copilot/using-model-context-protocol/extending-copilot-chat-with-mcp" },
+      { "q": "How do you add an MCP server?", "a": "Add the server's configuration (command or URL, plus any credentials) in the app's MCP settings or a project config file.", "url": "https://docs.github.com/en/copilot/customizing-copilot/using-model-context-protocol/extending-copilot-chat-with-mcp" },
+      { "q": "Why add an MCP server?", "a": "It gives Copilot new capabilities, such as querying a database, reading tickets or calling an API.", "url": "https://docs.github.com/en/copilot/customizing-copilot/using-model-context-protocol/extending-copilot-chat-with-mcp" },
+      { "q": "How can you give Copilot project-specific guidance?", "a": "Add custom instructions to the repository (for example .github/copilot-instructions.md).", "url": "https://docs.github.com/en/copilot/how-tos/configure-custom-instructions/add-repository-instructions" }
+    ]
+  }
+]
